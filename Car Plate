@@ -1,39 +1,44 @@
-def frontend(plate):
-    if plate.isalnum() == False or plate[0].isalpha() == False or plate[-1].isalpha() == False:
-        return True
+def generate_plate(vehicle):
+    vehicle_last = vehicle[:-1]
+    vehicle_char = vehicle_last.rstrip('0123456789')
+    vehicle_num = vehicle_last[len(vehicle_char):]
+    vehicle_num4 = vehicle_num.zfill(4)
+
+    if len(vehicle_char) == 3:
+        check1 = ord(vehicle_char[1]) - 64
+        check2 = ord(vehicle_char[2]) - 64
+    elif len(vehicle_char) == 2:
+        check1 = ord(vehicle_char[0]) - 64
+        check2 = ord(vehicle_char[1]) - 64
     else:
-        return False
+        check1 = 0
+        check2 = ord(vehicle_char[0]) - 64
 
-def order(plate):
-    for i in range(1, len(plate) - 2):
-        if plate[i].isalpha() == True and plate[i-1].isnumeric() == True:
-            return True
-    return False
+    remainder = (int(check1) * 9 + int(check2) * 4 + int(vehicle_num4[0]) * 5 + int(vehicle_num4[1]) * 4 + int(
+        vehicle_num4[2]) * 3 + int(vehicle_num4[3]) * 2) % 19
+    return check_list[remainder]
 
-vehicle = input("Enter Car Plate Number: ")
-while len(vehicle) < 3 or len(vehicle) >8 or frontend(vehicle) or order(vehicle):
-    vehicle = input("Enter Car Plate Number: ")
+def is_valid_plate(plate):
+    return plate[-1] == generate_plate(plate)
 
-vehicle_last = vehicle[:-1]
-vehicle_char = vehicle_last.rstrip('0123456789')
-vehicle_num = vehicle_last[len(vehicle_char):]
-vehicle_num4 = vehicle_num.zfill(4)
-
-if len(vehicle_char) == 3:
-    check1 = ord(vehicle_char[1])-64
-    check2 = ord(vehicle_char[2])-64
-elif len(vehicle_char) == 2:
-    check1 = ord(vehicle_char[0])-64
-    check2 = ord(vehicle_char[1])-64
-else:
-    check1 = 0
-    check2 = ord(vehicle_char[0])-64
-
-check = (int(check1) * 9 + int(check2) * 4 + int(vehicle_num4[0]) * 5 + int(vehicle_num4[1]) * 4 + int(vehicle_num4[2]) * 3 + int(vehicle_num4[3]) * 2) % 19
-
+#main
 check_list = ['A', 'Z', 'Y', 'X', 'U', 'T', 'S', 'R', 'P', 'M', 'L', 'K', 'J', 'H', 'G', 'E', 'D', 'C', 'B']
-correct_letter = check_list[int(check)]
-if(vehicle[-1] == correct_letter):
-    print("This is a valid carplate number.")
-else:
-    print("This is a NOT valid carplate number.")
+
+valid_plate = False
+while not valid_plate:
+    vehicle = input("Enter Car Plate Number: ")
+    if len(vehicle) == 0:
+        print("Empty input")
+    elif len(vehicle) < 3 or len(vehicle) >8:
+        print("PLate number should be between 3 to 8 characters")
+    elif vehicle[-1] not in check_list:
+        print("Illegal last digit")
+    elif not vehicle.isalnum():
+        print("Plate number only consists of letters and numbers")
+    elif not (vehicle[0].isalpha() or vehicle[-1].isalpha()):
+        print("Plate number starts with a letter and ends with a letter")
+    elif not is_valid_plate(vehicle):
+        print("Invalid check digit")
+    else:
+        valid_plate = True
+print(vehicle, "is valid.")
